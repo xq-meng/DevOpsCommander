@@ -52,6 +52,8 @@ namespace DevOpsCommander
         { 
             Console.WriteLine("Azure Queue Storage client library v12.");
 
+            Console.WriteLine(options.Command);
+
             if(string.IsNullOrEmpty(options.Command))
             {
                 return;

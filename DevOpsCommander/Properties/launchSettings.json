@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "DevOpsCommander": {
+      "commandName": "Project",
+      "commandLineArgs": "START",
+      "workingDirectory": "C:\\Users\\t-xiameng\\source\\repos\\DevOpsCommander\\test"
+    }
+  }
+}

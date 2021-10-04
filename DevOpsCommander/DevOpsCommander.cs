@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Queues;
-using CommandLine;
 using MessageQueue;
 using System;
 using System.Collections.Generic;
@@ -12,13 +11,10 @@ namespace DevOpsCommander
     {
         public class Options
         {
-            [Option('s', "ConnectionString", Required = true, HelpText = "Azure storage queue connection string.")]
             public string ConnectionString { get; set; }
 
-            [Option('q', "QueueName", Required = true, HelpText = "Azure storage queue name.")]
             public string QueueName { get; set; }
 
-            [Option('c', "Command", Required = false, HelpText = "Input the command you want to execute on SapPor.")]
             public string Command { get; set; }
         }
 
@@ -37,22 +33,21 @@ namespace DevOpsCommander
 
         static async Task Main(string[] args)
         {
-            ParserResult<Options> parserResult = Parser.Default.ParseArguments<Options>(args);
-            if (parserResult.Tag != ParserResultType.Parsed)
+            if(args.Length < 3)
             {
-                _ = ((NotParsed<Options>)parserResult).Errors;
                 return;
             }
 
-            var options = ((Parsed<Options>)parserResult).Value;
+            var options = new Options();
+            options.ConnectionString = args[0];
+            options.QueueName = args[1];
+            options.Command = args[2];
             await Run(options);
         }
 
         static async Task Run(Options options) 
         { 
             Console.WriteLine("Azure Queue Storage client library v12.");
-
-            Console.WriteLine(options.Command);
 
             if(string.IsNullOrEmpty(options.Command))
             {

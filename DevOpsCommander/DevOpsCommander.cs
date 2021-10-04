@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Queues;
+using CommandLine;
 using MessageQueue;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,8 +8,20 @@ using System.Threading.Tasks;
 
 namespace DevOpsCommander
 {
-    internal class DevOpsCommander
+    class DevOpsCommander
     {
+        public class Options
+        {
+            [Option('s', "ConnectionString", Required = true, HelpText = "Azure storage queue connection string.")]
+            public string ConnectionString { get; set; }
+
+            [Option('q', "QueueName", Required = true, HelpText = "Azure storage queue name.")]
+            public string QueueName { get; set; }
+
+            [Option('c', "Command", Required = false, HelpText = "Input the command you want to execute on SapPor.")]
+            public string Command { get; set; }
+        }
+
         static void MessageAnalysis(string theMessage, out string prefix, out string message)
         {
             if(string.IsNullOrEmpty(theMessage) || theMessage[0] != '[')
@@ -25,31 +37,31 @@ namespace DevOpsCommander
 
         static async Task Main(string[] args)
         {
+            ParserResult<Options> parserResult = Parser.Default.ParseArguments<Options>(args);
+            if (parserResult.Tag != ParserResultType.Parsed)
+            {
+                _ = ((NotParsed<Options>)parserResult).Errors;
+                return;
+            }
+
+            var options = ((Parsed<Options>)parserResult).Value;
+            await Run(options);
+        }
+
+        static async Task Run(Options options) 
+        { 
             Console.WriteLine("Azure Queue Storage client library v12.");
 
-            string ConnectionString, QueueName;
-            // Read json
-            Dictionary<string, string> messageQueueConfig;
-            try
+            if(string.IsNullOrEmpty(options.Command))
             {
-                string messageQueueConfigText = System.IO.File.ReadAllText("AzureStorgeQueue.json");
-                messageQueueConfig = JsonConvert.DeserializeObject<Dictionary<string, string>>(messageQueueConfigText);
-                ConnectionString = messageQueueConfig["ConnectionString"];
-                QueueName = messageQueueConfig["QueueName"];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
                 return;
             }
 
-            if(args.Length != 1)
-            {
-                return;
-            }
+            string ConnectionString = options.ConnectionString;
+            string QueueName = options.QueueName;
 
             string prefix = "[AZURECLOUD]";
-            string toSend = prefix + args[0];
+            string toSend = prefix + options.Command;
 
             QueueClient theQueue = await MQOperation.QueueConnection(ConnectionString, QueueName);
             await MQOperation.InsertMessageAsync(theQueue, toSend);

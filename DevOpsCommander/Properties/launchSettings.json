@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DevOpsCommander": {
-      "commandName": "Project",
-      "commandLineArgs": "-s DefaultEndpointsProtocol=https;AccountName=anbtest;AccountKey=jwINv+NPC9V+JT4k2r3clbwykCoHuCUcKJDQuyJSR2JRmzbwASXrUW6xZfegw/E21KOqWJw2aQ6KuKXkT8FTVw==;EndpointSuffix=core.windows.net -q sapportest -c START_SYNCHRONIZE"
-    }
-  }
-}
